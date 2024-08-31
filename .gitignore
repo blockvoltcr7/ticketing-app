@@ -35,26 +35,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# eslint
-.now/*
-*.css
-.changeset
-dist
-esm/*
-public/*
-tests/*
-scripts/*
-*.config.js
-.DS_Store
-node_modules
-coverage
-.next
-build
-!.commitlintrc.cjs
-!.lintstagedrc.cjs
-!jest.config.js
-!plopfile.js
-!react-shim.js
-!tsup.config.ts
-
 

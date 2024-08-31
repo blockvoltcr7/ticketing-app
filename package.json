@@ -3,16 +3,16 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbo",
+		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
+		"lint": "next lint"
 	},
 	"dependencies": {
 		"@nextui-org/button": "2.0.37",
 		"@nextui-org/code": "2.0.32",
 		"@nextui-org/input": "2.2.4",
-		"@nextui-org/kbd": "2.0.33",
+		 "@nextui-org/kbd": "2.0.33",
 		"@nextui-org/link": "2.0.34",
 		"@nextui-org/listbox": "2.1.25",
 		"@nextui-org/navbar": "2.0.36",
