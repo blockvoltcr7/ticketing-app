@@ -40,12 +40,12 @@ enum TicketStatus {
 }
 
 model Ticket {
-  id          Int          @id @default(autoincrement())
-  title       String       @db.VarChar(255)
-  description String       @db.Text
-  status      TicketStatus @default(OPEN)
-  createdAt   DateTime     @default(now())
-  priority    Priority     @default(MEDIUM)
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String
+  priority    String
+  created_at  DateTime @default(now())
 }
 
 enum Priority {
