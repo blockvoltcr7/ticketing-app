@@ -9,39 +9,37 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { Ticket } from "@prisma/client";
 
-export function TicketForm() {
+interface TicketFormProps {
+  ticket?: Ticket;
+}
+
+export function TicketForm({ ticket }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<TicketFormData>({
     resolver: zodResolver(TicketSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      status: "OPEN",
-      priority: "MEDIUM",
+      title: ticket?.title || "",
+      description: ticket?.description || "",
+      status: ticket?.status || "OPEN",
+      priority: ticket?.priority || "MEDIUM",
     },
   });
 
   const onSubmit = async (data: TicketFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/tickets/prisma', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create ticket');
+      if (ticket) {
+        await axios.patch(`/api/tickets/${ticket.id}`, data);
+      } else {
+        await axios.post('/api/tickets', data);
       }
-
-      // Handle successful submission (e.g., show success message, reset form)
-      form.reset();
+      // Handle successful submission (e.g., show success message, redirect)
     } catch (error) {
-      console.error('Error creating ticket:', error);
+      console.error('Error submitting ticket:', error);
       // Handle error (e.g., show error message)
     } finally {
       setIsSubmitting(false);
@@ -138,7 +136,7 @@ export function TicketForm() {
         </div>
 
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Create Ticket'}
+          {isSubmitting ? 'Submitting...' : (ticket ? 'Update Ticket' : 'Create Ticket')}
         </Button>
       </form>
     </Form>
