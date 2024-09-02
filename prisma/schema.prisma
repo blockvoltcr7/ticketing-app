@@ -33,7 +33,7 @@ model User {
 }
 
 // Add this enum definition before the Ticket model
-enum TicketStatus {
+enum Status {
   OPEN
   IN_PROGRESS
   CLOSED

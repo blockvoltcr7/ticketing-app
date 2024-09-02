@@ -37,7 +37,8 @@ export async function GET() {
       throw new Error('Failed to create tickets table')
     }
   } catch (error) {
-    console.error('Failed to create tickets table:', error)
-    return NextResponse.json({ error: 'Failed to create tickets table', details: error.message }, { status: 500 })
+    const err = error as Error; // Type assertion
+    console.error('Failed to create tickets table:', err);
+    return NextResponse.json({ error: 'Failed to create tickets table', details: err.message }, { status: 500 });
   }
 }

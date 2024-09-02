@@ -2,6 +2,13 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+/**
+ * This script is used to seed the database with dummy ticket data.
+ * It first deletes all existing ticket data, then creates new tickets.
+ * The new tickets are defined in the dummyTickets array.
+ * Each ticket has a title, description, status, and priority.
+ * The script logs a success message when the seed data is inserted.
+ */
 async function main() {
   // Delete existing data
   await prisma.ticket.deleteMany()
