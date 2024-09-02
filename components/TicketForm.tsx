@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Ticket } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 interface TicketFormProps {
   ticket?: Ticket;
@@ -18,14 +19,15 @@ interface TicketFormProps {
 
 export function TicketForm({ ticket }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<TicketFormData>({
     resolver: zodResolver(TicketSchema),
     defaultValues: {
       title: ticket?.title || "",
       description: ticket?.description || "",
-      status: ticket?.status || "OPEN",
-      priority: ticket?.priority || "MEDIUM",
+      status: (ticket?.status || "OPEN") as "OPEN" | "IN_PROGRESS" | "CLOSED",
+      priority: (ticket?.priority || "MEDIUM") as "LOW" | "MEDIUM" | "HIGH",
     },
   });
 
@@ -38,6 +40,7 @@ export function TicketForm({ ticket }: TicketFormProps) {
         await axios.post('/api/tickets', data);
       }
       // Handle successful submission (e.g., show success message, redirect)
+      router.push('/tickets'); // Add this line to redirect after successful submission
     } catch (error) {
       console.error('Error submitting ticket:', error);
       // Handle error (e.g., show error message)
