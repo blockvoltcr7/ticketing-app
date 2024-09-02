@@ -1,22 +1,29 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file.
+// It defines the data model for your application and is used by Prisma to generate
+// the database schema and type-safe database client.
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma uses this file to:
+// 1. Generate the database schema
+// 2. Generate the Prisma Client for type-safe database queries
+// 3. Provide a source of truth for your data model
 
+// The `generator` block specifies how to generate the Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
+// The `datasource` block specifies your database connection
 datasource db {
   provider = "postgresql"
-  // Uses connection pooling
-  url = env("POSTGRES_PRISMA_URL")
-  // Uses direct connection, ⚠️ make sure to keep this to `POSTGRES_URL_NON_POOLING`
-  // or you'll have dangling databases from migrations
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  url      = env("DATABASE_URL")
 }
- 
+
+// Models represent tables in your database and entities in your application
+
+// /**
+//  * User Model
+//  * Represents a user in the application
+//  */
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -24,3 +31,26 @@ model User {
   image     String
   createdAt DateTime @default(now())
 }
+
+// Add this enum definition before the Ticket model
+enum Status {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String
+  priority    String
+  created_at  DateTime @default(now())
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
