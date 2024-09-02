@@ -24,7 +24,7 @@ export const columns: ColumnDef<Ticket>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <TicketStatusBadge status={row.original.status} />,
+    cell: ({ row }) => <TicketStatusBadge status={row.original.status as "OPEN" | "IN_PROGRESS" | "CLOSED"} />,
   },
   {
     accessorKey: "priority",

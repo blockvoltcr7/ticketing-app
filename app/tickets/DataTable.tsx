@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DataTable, DataTableColumn } from "@shadcn/ui"
+import { DataTable } from "@/components/ui/data-table"
+import { ColumnDef } from "@tanstack/react-table"
 import { Ticket } from "@prisma/client"
 import TicketStatusBadge from "@/components/TicketStatusBadge"
 
@@ -29,15 +30,19 @@ const DataTableComponent = ({ tickets }: DataTableProps) => {
     fetchTickets()
   }, [])
 
-  return (
-    <DataTable data={data}>
-      <DataTableColumn field="id" header="ID" />
-      <DataTableColumn field="title" header="Title" />
-      <DataTableColumn field="status" header="Status" cell={({ row }) => <TicketStatusBadge status={row.original.status} />} />
-      <DataTableColumn field="priority" header="Priority" />
-      <DataTableColumn field="created_at" header="Created At" />
-    </DataTable>
-  )
+  const columns: ColumnDef<Ticket>[] = [
+    { accessorKey: "id", header: "ID" },
+    { accessorKey: "title", header: "Title" },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <TicketStatusBadge status={row.original.status as "OPEN" | "IN_PROGRESS" | "CLOSED"} />
+    },
+    { accessorKey: "priority", header: "Priority" },
+    { accessorKey: "created_at", header: "Created At" },
+  ]
+
+  return <DataTable columns={columns} data={data} />
 }
 
 export default DataTableComponent

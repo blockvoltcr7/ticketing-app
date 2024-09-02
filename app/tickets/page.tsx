@@ -11,16 +11,28 @@
 
 import { useState, useEffect } from "react"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input, Textarea, Select, SelectItem } from "@nextui-org/react"
+import { z } from "zod";
 
+// Define the Zod schema for a new ticket
+const NewTicketSchema = z.object({
+  title: z.string().min(1, "Title is required").max(255, "Title is too long"),
+  description: z.string().optional(),
+  status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+});
 
+// Infer the TypeScript type from the schema
+type NewTicket = z.infer<typeof NewTicketSchema>;
+
+// Define the Ticket type
 type Ticket = {
-  id: number
-  title: string
-  description: string
-  status: "OPEN" | "IN_PROGRESS" | "CLOSED"
-  priority: "LOW" | "MEDIUM" | "HIGH"
-  created_at: string
-}
+  id: number;
+  title: string;
+  description?: string;
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  created_at: string;
+};
 
 export default function TicketingPage() {
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -153,13 +165,17 @@ export default function TicketingPage() {
    */
   const handleSubmit = async () => {
     try {
+      // Validate the new ticket data against the schema
+      const validatedData = NewTicketSchema.parse(newTicket);
+
       const response = await fetch('/api/tickets/prisma', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newTicket),
+        body: JSON.stringify(validatedData),
       });
+
       if (response.ok) {
         onClose();
         fetchTicketsWithPrisma();
@@ -173,7 +189,13 @@ export default function TicketingPage() {
         throw new Error('Failed to create ticket');
       }
     } catch (error) {
-      console.error('Failed to create ticket:', error);
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        console.error('Validation error:', error.errors);
+        // You could set these errors in state and display them in the UI
+      } else {
+        console.error('Failed to create ticket:', error);
+      }
     }
   };
 

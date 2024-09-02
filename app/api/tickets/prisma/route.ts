@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { z } from "zod";
 
 /**
  * This file contains API route handlers for ticket operations using Prisma ORM.
@@ -27,7 +28,7 @@ export async function GET() {
     return NextResponse.json(tickets)
   } catch (error) {
     console.error('Failed to fetch tickets with Prisma:', error)
-    return NextResponse.json({ error: 'Failed to fetch tickets with Prisma', details: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch tickets with Prisma', details: (error as Error).message }, { status: 500 })
   }
 }
 
@@ -38,21 +39,26 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const { title, description, status, priority } = await request.json();
-    console.log('Attempting to create ticket with Prisma:', { title, description, status, priority });
-    // Use Prisma's create method to insert a new ticket into the database
+    const body = await request.json();
+    const validatedData = TicketSchema.parse(body);
+
     const newTicket = await prisma.ticket.create({
-      data: {
-        title,
-        description,
-        status,
-        priority,
-      },
+      data: validatedData,
     });
-    console.log('Created ticket:', newTicket);
+
     return NextResponse.json(newTicket, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid ticket data', details: error.errors }, { status: 400 });
+    }
     console.error('Failed to create ticket with Prisma:', error);
-    return NextResponse.json({ error: 'Failed to create ticket with Prisma', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create ticket' }, { status: 500 });
   }
 }
+
+const TicketSchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+  status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+});

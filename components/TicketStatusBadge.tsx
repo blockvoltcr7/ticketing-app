@@ -1,13 +1,12 @@
 import React from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Status } from "@prisma/client"
 
 interface Props {
-    status: Status;
+    status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED';
 }
 
-// Create a statusMap of Record<Status, {label: string; color: string}>
-const statusMap: Record<Status, {label: string; color: string}> = {
+// Create a statusMap of Record<string, {label: string; color: string}>
+const statusMap: Record<string, {label: string; color: string}> = {
     OPEN: {label: 'Open', color: "bg-green-400"},
     IN_PROGRESS: {label: 'In Progress', color: "bg-blue-400"},
     CLOSED: {label: 'Closed', color: "bg-red-400"},
