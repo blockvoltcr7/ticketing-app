@@ -33,7 +33,7 @@ export default function DataTableSimple({ users }: Props) {
       </TableHeader>
       <TableBody>
         {users.map((user) => (
-          <TableRow key={user.id} className="cursor-pointer hover:bg-gray-100">
+          <TableRow key={user.id}>
             <TableCell>
               <Link href={`/users/${user.id}`} className="text-blue-600 hover:underline">
                 {user.name}
