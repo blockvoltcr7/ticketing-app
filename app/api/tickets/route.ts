@@ -8,13 +8,21 @@ import prisma from '@/lib/prisma'
 export async function GET() {
   try {
     const tickets = await prisma.ticket.findMany({
-      orderBy: {
-        created_at: 'desc'
-      }
+      include: {
+        assignedToUser: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            role: true,
+          },
+        },
+      },
     });
     return NextResponse.json(tickets);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch tickets', details: (error as Error).message }, { status: 500 });
+    console.error('Failed to fetch tickets:', error);
+    return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
   }
 }
 
@@ -25,17 +33,19 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const { title, description, status, priority } = await request.json();
+    const { title, description, status, priority, assignedToUserId } = await request.json();
     const newTicket = await prisma.ticket.create({
       data: {
         title,
         description,
         status,
         priority,
+        assignedToUserId: assignedToUserId ? parseInt(assignedToUserId) : null,
       },
     });
     return NextResponse.json(newTicket, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create ticket', details: (error as Error).message }, { status: 500 });
+    console.error('Failed to create ticket:', error);
+    return NextResponse.json({ error: 'Failed to create ticket' }, { status: 500 });
   }
 }
