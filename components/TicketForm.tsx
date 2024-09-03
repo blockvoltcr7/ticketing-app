@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Ticket } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
 
 interface TicketFormProps {
   ticket?: Ticket;
@@ -19,7 +20,17 @@ interface TicketFormProps {
 
 export function TicketForm({ ticket }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [users, setUsers] = useState<{ id: number; name: string }[]>([]); // Define user type
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchUsers() {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+    }
+    fetchUsers();
+  }, []);
 
   const form = useForm<TicketFormData>({
     resolver: zodResolver(TicketSchema),
@@ -28,6 +39,7 @@ export function TicketForm({ ticket }: TicketFormProps) {
       description: ticket?.description || "",
       status: (ticket?.status || "OPEN") as "OPEN" | "IN_PROGRESS" | "CLOSED",
       priority: (ticket?.priority || "MEDIUM") as "LOW" | "MEDIUM" | "HIGH",
+      assignedToUserId: ticket?.assignedToUserId || "", // Ensure this is defined in TicketFormData
     },
   });
 
@@ -136,6 +148,31 @@ export function TicketForm({ ticket }: TicketFormProps) {
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="assignedToUserId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assign To</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a user" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id.toString()}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <Button type="submit" disabled={isSubmitting}>

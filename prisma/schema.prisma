@@ -20,32 +20,37 @@ datasource db {
 
 // Models represent tables in your database and entities in your application
 
+// Add this enum definition before the User model
+enum Role {
+  ADMIN
+  TECH
+  USER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  username  String   @unique  // Add the @unique attribute here
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tickets   Ticket[]
+}
+
 // /**
 //  * User Model
 //  * Represents a user in the application
 //  */
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  image     String
-  createdAt DateTime @default(now())
-}
-
-// Add this enum definition before the Ticket model
-enum Status {
-  OPEN
-  IN_PROGRESS
-  CLOSED
-}
-
 model Ticket {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  status      String
-  priority    String
-  created_at  DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  title            String
+  description      String?
+  status           String
+  priority         String
+  created_at       DateTime @default(now())
+  assignedToUserId Int?     // Add this field
+  assignedToUser   User?    @relation(fields: [assignedToUserId], references: [id]) // Add this relation
 }
 
 enum Priority {
